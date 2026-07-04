@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cephalon Delta</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside id="sidebar" class="sidebar" aria-label="Navegação principal">
+        <div class="sidebar__brand">
+          <div>
+            <h1>TENNO</h1>
+            <p>Mastery Rank 30</p>
+          </div>
+        </div>
+
+        <nav class="sidebar__nav" aria-label="Menu principal">
+          <a class="nav-link is-active" href="#">
+            <span class="material-symbols-outlined" aria-hidden="true">dashboard</span>
+            <span class="nav-link__label">Dashboard</span>
+          </a>
+        </nav>
+
+        <div class="sidebar__footer" aria-label="Links auxiliares">
+          <a class="nav-link" href="#" data-open-modal="supportModal">
+            <span class="material-symbols-outlined" aria-hidden="true">help</span>
+            <span class="nav-link__label">Support</span>
+          </a>
+        </div>
+      </aside>
+
+      <header class="header">
+        <div class="header__left">
+          <button id="sidebarToggle" class="icon-button" type="button" aria-label="Alternar barra lateral">
+            <span class="material-symbols-outlined" aria-hidden="true">menu</span>
+          </button>
+
+          <div class="header__title">
+            <h2>Cephalon Delta</h2>
+          </div>
+
+          <label class="header__search" aria-label="Buscar itens">
+            <span class="material-symbols-outlined" aria-hidden="true">search</span>
+            <input type="search" placeholder="Search items...">
+          </label>
+        </div>
+
+        <div class="header__right">
+          <div class="avatar" aria-hidden="true">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYbKvxAv8PFL-Ahz-D7BbAiKIKTRK1AQBcJKR49SoQicF2WyDLvKyl3b8eoo7JobzXnRhVkMY2_y7HMqmSA7-9GZaA0iblPnUd7m9IVyIBRexM2SSR87WPM97c5NT5Z1rjcB_E92RvqZk6OqEzCNcJToC_CmYp04fqMYIlJZZlUBAQMr7R_oiAlGNRH6qro5yd9NK6NBj1k-j73X2hTsTzB5LZDwEQHOclfzxNZk1HXKp19SSnvwCABz2c4tRPyoCdBYdxc1ORvljl" alt="Avatar do usuário">
+          </div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="page-header">
+          <div>
+            <h3>Dashboard</h3>
+            <p>Active Prime Farming Objectives</p>
+          </div>
+          <button class="primary-btn" type="button" data-open-modal="addSetModal">
+            <span class="material-symbols-outlined" aria-hidden="true">add</span>
+            <span>Add Set</span>
+          </button>
+        </div>
+
+        <div class="card-grid">
+          {% if inventorys %}
+            {% for inventory in inventorys %}
+              <section class="glass-panel amber-glow set-card" aria-labelledby="set-{{ inventory.id }}">
+                <div class="set-card__header">
+                  <div class="set-card__title">
+                    <div class="set-card__cover">
+                      <img src="{{ inventory.game_item.image_url }}" alt="{{ inventory.game_item.name }}">
+                    </div>
+                    <div>
+                      <h4 id="set-{{ inventory.id }}" class="set-card__name">{{ inventory.game_item.name }}</h4>
+                      <span class="set-card__meta">
+                        <span class="material-symbols-outlined" aria-hidden="true">toll</span>
+                        <span>{{ inventory.game_item.ducats }} Ducats</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <form action="{{ url_for('delete', id=inventory.id) }}" method="post">
+                    <button class="icon-button" type="submit" aria-label="Remover conjunto">
+                      <span class="material-symbols-outlined" aria-hidden="true">delete_outline</span>
+                    </button>
+                  </form>
+                </div>
+
+                <div class="set-card__parts">
+                  {% for part in inventory.inventory_parts %}
+                    <article class="part-card {% if part.count == 0 %}is-missing{% endif %}">
+                      <span class="part-card__label">{{ part.item_part.part.name }}</span>
+                      <div class="part-card__controls">
+                        <form action="{{ url_for('remove', id=part.id) }}" method="post">
+                          <button type="submit" aria-label="Remover parte">
+                            <span class="material-symbols-outlined" aria-hidden="true">remove</span>
+                          </button>
+                        </form>
+                        <span class="part-card__value">{{ part.count }}</span>
+                        <form action="{{ url_for('add', id=part.id) }}" method="post">
+                          <button type="submit" aria-label="Adicionar parte">
+                            <span class="material-symbols-outlined" aria-hidden="true">add</span>
+                          </button>
+                        </form>
+                      </div>
+                      <span class="part-card__status">{% if part.count > 0 %}owned{% else %}missing{% endif %}</span>
+                    </article>
+                  {% endfor %}
+                </div>
+              </section>
+            {% endfor %}
+          {% else %}
+            <section class="glass-panel set-card" aria-label="Sem conjuntos cadastrados">
+              <p>No set registered yet.</p>
+            </section>
+          {% endif %}
+
+          <button class="glass-panel add-set-card" type="button" data-open-modal="addSetModal">
+            <span class="add-set-card__icon">
+              <span class="material-symbols-outlined" aria-hidden="true">add</span>
+            </span>
+            <span>Add new set</span>
+            <small>Select from codex</small>
+          </button>
+        </div>
+      </main>
+    </div>
+
+    <div id="addSetModal" class="modal modal--new" role="dialog" aria-modal="true" aria-labelledby="addSetTitle">
+      <div class="modal__panel modal__panel--new">
+        <div class="modal__hero">
+          <div>
+            <p class="modal__eyebrow">Codex</p>
+            <h2 id="addSetTitle">Select a Prime Set</h2>
+            <p class="modal__description">Choose a new Prime to track in your dashboard.</p>
+          </div>
+          <button class="modal__close modal__close--new" type="button" data-close-modal="addSetModal" aria-label="Fechar">
+            <span class="material-symbols-outlined" aria-hidden="true">close</span>
+          </button>
+        </div>
+
+        <label class="modal__search" aria-label="Pesquisar conjuntos">
+          <span class="material-symbols-outlined" aria-hidden="true">search</span>
+          <input type="search" class="modal_input" placeholder="Search codex for Prime parts...">
+        </label>
+
+        <div class="modal__list custom-scrollbar">
+          {% if items %}
+            {% for item in items %}
+              <form action="{{ url_for('create', id=item.id) }}" method="post">
+                <button class="modal__item modal__item--new" type="submit">
+                  <div class="modal__thumb">
+                    <img src="{{ item.image_url }}" alt="{{ item.name }}">
+                  </div>
+                  <div class="modal__item-content">
+                    <strong>{{ item.name }}</strong>
+                    <span class="modal__tag">{{ item.ducats }} Ducats</span>
+                  </div>
+                  <span class="modal__add-icon" aria-hidden="true">
+                    <span class="material-symbols-outlined">add_circle</span>
+                  </span>
+                </button>
+              </form>
+            {% endfor %}
+          {% else %}
+            <p class="modal__empty">No sets available right now.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div id="supportModal" class="modal modal--new" role="dialog" aria-modal="true" aria-labelledby="supportModalTitle">
+      <div class="modal__panel modal__panel--new">
+        <div class="modal__hero">
+          <div>
+            <p class="modal__eyebrow">Support</p>
+            <h2 id="supportModalTitle">Need help with Cephalon Delta?</h2>
+            <p class="modal__description">Cephalon Delta is an open-source companion application for Warframe players who want a simple way to track Prime farming progress. It helps you organize your active Prime sets, monitor collected parts, and keep track of their Ducat values for future Baro Ki'Teer visits.</p>
+            <br>
+            <p class="modal__description">This project was built as both a learning experience and a tool for the community. While it currently focuses on collection tracking, new features may be added over time based on community feedback.</p>
+            <br>
+            <p class="modal__description">If you encounter a bug, have a suggestion, or would like to contribute, feel free to visit the project's GitHub repository or join the discussion with the community.</p>
+          </div>
+          <button class="modal__close modal__close--new" type="button" data-close-modal="supportModal" aria-label="Fechar">
+            <span class="material-symbols-outlined" aria-hidden="true">close</span>
+          </button>
+        </div>
+        <a class="primary-btn" href="https://github.com" target="_blank" rel="noopener noreferrer" style="display: inline-flex; margin-top: 0.5rem;">Go to GitHub</a>
+      </div>
+    </div>
+
+    <script>
+      const sidebar = document.getElementById('sidebar');
+      const sidebarToggle = document.getElementById('sidebarToggle');
+      const headerSearch = document.querySelector('.header__search input');
+      const modalSearch = document.querySelector('.modal__search input');
+      const setCards = Array.from(document.querySelectorAll('.set-card')).filter((card) => !card.classList.contains('add-set-card'));
+      const modalItems = Array.from(document.querySelectorAll('.modal__item'));
+      const modalList = document.querySelector('.modal__list');
+
+      const SIDEBAR_STORAGE_KEY = 'cephalonDeltaSidebarCollapsed';
+
+      function setSidebarState(collapsed) {
+        if (collapsed) {
+          sidebar.classList.add('is-collapsed');
+        } else {
+          sidebar.classList.remove('is-collapsed');
+        }
+        localStorage.setItem(SIDEBAR_STORAGE_KEY, collapsed ? 'true' : 'false');
+      }
+
+      if (sidebarToggle) {
+        const savedState = localStorage.getItem(SIDEBAR_STORAGE_KEY);
+        if (savedState === 'true') {
+          sidebar.classList.add('is-collapsed');
+        }
+
+        sidebarToggle.addEventListener('click', () => {
+          const collapsed = !sidebar.classList.contains('is-collapsed');
+          setSidebarState(collapsed);
+        });
+      }
+
+      function normalizeText(text) {
+        return text.trim().toLowerCase();
+      }
+
+      function filterSetCards(query) {
+        const normalizedQuery = normalizeText(query);
+        setCards.forEach((card) => {
+          const label = card.querySelector('.set-card__name')?.textContent || '';
+          const meta = card.querySelector('.set-card__meta')?.textContent || '';
+          const matches = normalizeText(label + ' ' + meta).includes(normalizedQuery);
+          card.style.display = matches ? '' : 'none';
+        });
+      }
+
+      function ensureModalEmptyState() {
+        const visibleItems = modalItems.filter((item) => item.style.display !== 'none');
+        let emptyMessage = modalList.querySelector('.modal__empty-filter');
+
+        if (visibleItems.length === 0) {
+          if (!emptyMessage) {
+            emptyMessage = document.createElement('p');
+            emptyMessage.className = 'modal__empty modal__empty-filter';
+            emptyMessage.textContent = 'Nenhum conjunto encontrado.';
+            modalList.appendChild(emptyMessage);
+          }
+        } else if (emptyMessage) {
+          emptyMessage.remove();
+        }
+      }
+
+      function filterModalItems(query) {
+        const normalizedQuery = normalizeText(query);
+        modalItems.forEach((item) => {
+          const name = item.querySelector('strong')?.textContent || '';
+          const tag = item.querySelector('.modal__tag')?.textContent || '';
+          const matches = normalizeText(name + ' ' + tag).includes(normalizedQuery);
+          item.style.display = matches ? '' : 'none';
+        });
+        ensureModalEmptyState();
+      }
+
+      if (headerSearch) {
+        headerSearch.addEventListener('input', (event) => {
+          filterSetCards(event.target.value);
+        });
+      }
+
+      if (modalSearch) {
+        modalSearch.addEventListener('input', (event) => {
+          filterModalItems(event.target.value);
+        });
+      }
+
+      document.querySelectorAll('[data-open-modal]').forEach((trigger) => {
+        trigger.addEventListener('click', () => {
+          const modal = document.getElementById(trigger.dataset.openModal);
+          if (modal) {
+            modal.classList.add('is-open');
+            document.body.classList.add('modal-open');
+          }
+        });
+      });
+
+      document.querySelectorAll('[data-close-modal]').forEach((trigger) => {
+        trigger.addEventListener('click', () => {
+          const modal = document.getElementById(trigger.dataset.closeModal);
+          if (modal) {
+            modal.classList.remove('is-open');
+            document.body.classList.remove('modal-open');
+          }
+        });
+      });
+
+      document.querySelectorAll('.modal').forEach((modal) => {
+        modal.addEventListener('click', (event) => {
+          if (event.target === modal) {
+            modal.classList.remove('is-open');
+            document.body.classList.remove('modal-open');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
