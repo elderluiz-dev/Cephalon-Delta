@@ -371,7 +371,7 @@ Open your browser:
 http://127.0.0.1:5000
 ```
 
-> **Note 1:** The repository already includes a fully populated SQLite database (`instance/CephalonDelta.db`) containing all currently supported Prime items. No manual seeding is required to use the application. The `seed` scripts exists only to update the local game database whenever new Prime items are released.
+> **Note 1:** The repository already includes a already populated SQLite database (`instance/CephalonDelta.db`) containing all currently supported Prime items. No manual seeding is required to use the application. The `seed` scripts exists only to update the local game database whenever new Prime items are released.
 
 > **Note 2:** The database and the application are not fully populated, as this is an ongoing project. If you download the application for your own use, please note that you will need to populate it with additional items according to your needs or wait for the project to be updated.
 
