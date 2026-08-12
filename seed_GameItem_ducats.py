@@ -9,7 +9,6 @@ with app.app_context():
     items = GameItem.query.all()
     n = 1
 
-
     for item in data["data"]:
         if "ducats" in item:
             ref_id = item["i18n"]["en"]["name"]
