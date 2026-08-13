@@ -1,0 +1,6 @@
+Rebuild the UI for UX;
+
+Add asynchronour info consumption with fetch API;
+
+Add login module with JWT and OAuth;
+
